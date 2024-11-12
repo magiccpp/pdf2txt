@@ -1,0 +1,25 @@
+#!/bin/bash
+
+# Identify all staged .ipynb files
+staged_files=$(git diff --cached --name-only --diff-filter=ACM | grep '\.ipynb$')
+
+# Abort the commit if no Jupyter notebooks are staged
+if [ -z "$staged_files" ]; then
+  exit 0
+fi
+
+# Iterate over each staged Jupyter notebook
+echo "Stripping output from staged Jupyter notebooks..."
+for file in $staged_files; do
+  # Use nbstripout to strip the outputs
+  nbstripout "$file"
+
+  # Re-add the modified file to the staging area
+  git add "$file"
+done
+
+echo "Output stripped from Jupyter notebooks."
+
+# Allow the commit to proceed
+exit 0
+
